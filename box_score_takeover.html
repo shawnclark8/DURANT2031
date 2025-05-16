@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Team Takeover Box Score</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #fff;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    .logo {
+      max-width: 220px;
+      margin: 20px auto;
+      display: block;
+    }
+    h1 {
+      color: #E65300;
+      font-size: 28px;
+      margin-top: 10px;
+    }
+    table {
+      width: 95%;
+      margin: 0 auto;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th {
+      background-color: #E65300;
+      color: white;
+      padding: 8px;
+    }
+    td {
+      padding: 6px;
+      border: 1px solid #ddd;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .team-name {
+      font-weight: bold;
+      font-size: 20px;
+      color: #333;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <img src="team_takeover_logo_resized.png" class="logo" alt="Team Takeover Logo">
+  <h1>Team Takeover - Official Box Score</h1>
+
+  <div class="team-name">Team Takeover</div>
+  <table>
+    <thead>
+      <tr><th>Player</th><th>FG</th><th>FG%</th><th>3PT</th><th>3PT%</th><th>FT</th><th>FT%</th><th>OREB</th><th>DREB</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>PTS</th></tr>
+    </thead>
+    <tbody id="home-stats">
+    </tbody>
+  </table>
+
+  <div class="team-name" style="margin-top: 30px;">Opponent</div>
+  <table>
+    <thead>
+      <tr><th>Player</th><th>FG</th><th>FG%</th><th>3PT</th><th>3PT%</th><th>FT</th><th>FT%</th><th>OREB</th><th>DREB</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>PTS</th></tr>
+    </thead>
+    <tbody id="opponent-stats">
+    </tbody>
+  </table>
+
+  <script>
+    const p = localStorage.getItem("players") ? JSON.parse(localStorage.getItem("players")) : { home: [], opponent: [] };
+
+    function fg(player) {
+      return player["2pm"] + player["3pm"] + "-" + (player["2pm"] + player["3pm"] + player["2pmissed"] + player["3pmissed"]);
+    }
+    function fgPct(player) {
+      const made = player["2pm"] + player["3pm"];
+      const att = made + player["2pmissed"] + player["3pmissed"];
+      return att ? Math.round((made / att) * 100) + "%" : "0%";
+    }
+    function threePt(player) {
+      return player["3pm"] + "-" + (player["3pm"] + player["3pmissed"]);
+    }
+    function threePct(player) {
+      const att = player["3pm"] + player["3pmissed"];
+      return att ? Math.round((player["3pm"] / att) * 100) + "%" : "0%";
+    }
+    function ft(player) {
+      return player["ftm"] + "-" + (player["ftm"] + player["ftmissed"]);
+    }
+    function ftPct(player) {
+      const att = player["ftm"] + player["ftmissed"];
+      return att ? Math.round((player["ftm"] / att) * 100) + "%" : "0%";
+    }
+    function total(player) {
+      return 2 * player["2pm"] + 3 * player["3pm"] + player["ftm"];
+    }
+
+    function render(team, id) {
+      const tbody = document.getElementById(id);
+      p[team].forEach(player => {
+        if (player.dnp) return;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${player.name}</td>
+          <td>${fg(player)}</td>
+          <td>${fgPct(player)}</td>
+          <td>${threePt(player)}</td>
+          <td>${threePct(player)}</td>
+          <td>${ft(player)}</td>
+          <td>${ftPct(player)}</td>
+          <td>${player.oreb}</td>
+          <td>${player.dreb}</td>
+          <td>${player.oreb + player.dreb}</td>
+          <td>${player.assists}</td>
+          <td>${player.stl}</td>
+          <td>${player.blk}</td>
+          <td>${player.to}</td>
+          <td>${total(player)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    render("home", "home-stats");
+    render("opponent", "opponent-stats");
+  </script>
+</body>
+</html>
