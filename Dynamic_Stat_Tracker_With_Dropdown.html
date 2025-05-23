@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dynamic Basketball Stat Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .setup-panel { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; background: #f9f9f9; }
+        .player-row { margin: 5px 0; }
+        .stat-table, .stat-table th, .stat-table td { border: 1px solid black; border-collapse: collapse; }
+        .stat-table th, .stat-table td { padding: 4px 8px; text-align: center; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="setup-panel">
+    <h2>Game Setup</h2>
+    <label for="gameDate">Game Date:</label>
+    <input type="date" id="gameDate" value="2025-05-23">
+    <label for="opponentName">Opponent:</label>
+    <input type="text" id="opponentName" placeholder="Opponent Name">
+    <br><br>
+    <label for="playerSelect">Select Players:</label>
+    <select id="playerSelect" multiple>
+        <option>Kam</option>
+        <option>Ronald</option>
+        <option>Jaedyn</option>
+        <option>Khalifa</option>
+        <option>Eli</option>
+        <option>Sammy</option>
+        <option>Ceasar</option>
+        <option>Juice</option>
+        <option>Ben</option>
+        <option>Noah</option>
+        <option>Lefty</option>
+        <option>Goose</option>
+    </select>
+    <button onclick="startGame()">Start Game</button>
+</div>
+
+<div id="statTracker" class="hidden">
+    <h3>Live Stat Tracker</h3>
+    <table class="stat-table" id="statsTable">
+        <thead>
+            <tr>
+                <th>Player</th><th>PTS</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>PF</th>
+            </tr>
+        </thead>
+        <tbody id="playerStats"></tbody>
+    </table>
+</div>
+
+<script>
+function startGame() {
+    const selectedOptions = Array.from(document.getElementById("playerSelect").selectedOptions);
+    const playerStats = document.getElementById("playerStats");
+    const statTracker = document.getElementById("statTracker");
+    playerStats.innerHTML = '';
+    selectedOptions.forEach(option => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${option.value}</td>` + "<td>0</td>".repeat(7);
+        playerStats.appendChild(row);
+    });
+    statTracker.classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
