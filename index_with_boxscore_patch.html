@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Basketball Stat Tracker</title>
+</head>
+<body>
+
+<h1>Stat Tracker (Simplified for Patch)</h1>
+<button onclick="openBoxScore()">BOX SCORE</button>
+
+<script>
+let players = {
+  home: [
+    { name: "Kam", "2pm": 3, "2pmissed": 1, "3pm": 2, "3pmissed": 2, "ftm": 4, "ftmissed": 1, "oreb": 2, "dreb": 3, "assists": 5, "stl": 1, "blk": 1, "to": 2, dnp: false },
+    { name: "Ronald", "2pm": 2, "2pmissed": 1, "3pm": 1, "3pmissed": 3, "ftm": 1, "ftmissed": 2, "oreb": 1, "dreb": 4, "assists": 4, "stl": 2, "blk": 0, "to": 3, dnp: false }
+  ],
+  opponent: [
+    { name: "Opponent", "2pm": 5, "2pmissed": 2, "3pm": 2, "3pmissed": 2, "ftm": 3, "ftmissed": 1, "oreb": 3, "dreb": 5, "assists": 2, "stl": 1, "blk": 1, "to": 4, dnp: false }
+  ]
+};
+
+function openBoxScore() {
+  const w = window.open("box_score_takeover.html", "_blank");
+  const transfer = () => { w.players = players; };
+  // wait for window to load or retry in case of cross-domain loading lag
+  w.onload = transfer;
+}
+</script>
+
+</body>
+</html>
