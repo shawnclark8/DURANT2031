@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Team Takeover Stat Tracker</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #ffffff; padding: 20px; }
+    .button-bar { text-align: center; margin-bottom: 20px; }
+    .button-bar button {
+      margin: 0 10px; padding: 10px 20px; font-size: 16px;
+      background-color: #E65300; color: white; border: none; border-radius: 5px; cursor: pointer;
+    }
+    .button-bar button:hover { background-color: #c74800; }
+  </style>
+</head>
+<body>
+  <div class="button-bar">
+    <button onclick="openBoxScore()">Box Score</button>
+  </div>
+  <script>
+    function openBoxScore() {
+      const players = JSON.parse(localStorage.getItem("players")) || { home: [], opponent: [] };
+      const logoHTML = '<img src="team_takeover_logo_resized.png" alt="Team Takeover Logo" style="max-width: 200px; display:block; margin: 0 auto 20px;" />';
+      const title = '<h1 style="text-align:center; color:#E65300;">Team Takeover - Box Score</h1>';
+
+      function renderTeam(teamPlayers, label) {
+        let totals = {
+          fgMade: 0, fgAtt: 0, threeMade: 0, threeAtt: 0, ftMade: 0, ftAtt: 0,
+          oreb: 0, dreb: 0, reb: 0, ast: 0, stl: 0, blk: 0, to: 0, pts: 0
+        };
+
+        let rows = teamPlayers.filter(p => !p.dnp).map(player => {
+          const fgMade = player["2pm"] + player["3pm"];
+          const fgAtt = fgMade + player["2pmissed"] + player["3pmissed"];
+          const fgPct = fgAtt ? ((fgMade / fgAtt) * 100).toFixed(1) + "%" : "0%";
+          const threeAtt = player["3pm"] + player["3pmissed"];
+          const threePct = threeAtt ? ((player["3pm"] / threeAtt) * 100).toFixed(1) + "%" : "0%";
+          const ftAtt = player["ftm"] + player["ftmissed"];
+          const ftPct = ftAtt ? ((player["ftm"] / ftAtt) * 100).toFixed(1) + "%" : "0%";
+          const totalReb = player["oreb"] + player["dreb"];
+          const points = (2 * player["2pm"]) + (3 * player["3pm"]) + player["ftm"];
+          totals.fgMade += fgMade; totals.fgAtt += fgAtt;
+          totals.threeMade += player["3pm"]; totals.threeAtt += threeAtt;
+          totals.ftMade += player["ftm"]; totals.ftAtt += ftAtt;
+          totals.oreb += player["oreb"]; totals.dreb += player["dreb"];
+          totals.reb += totalReb; totals.ast += player["assists"];
+          totals.stl += player["stl"]; totals.blk += player["blk"];
+          totals.to += player["to"]; totals.pts += points;
+
+          return \`
+          <tr>
+            <td>\${player.name}</td><td>\${fgMade}-\${fgAtt}</td><td>\${fgPct}</td><td>\${player["3pm"]}-\${threeAtt}</td>
+            <td>\${threePct}</td><td>\${player["ftm"]}-\${ftAtt}</td><td>\${ftPct}</td>
+            <td>\${player["oreb"]}</td><td>\${player["dreb"]}</td><td>\${totalReb}</td><td>\${player["assists"]}</td>
+            <td>\${player["stl"]}</td><td>\${player["blk"]}</td><td>\${player["to"]}</td><td>\${points}</td>
+          </tr>\`;
+        });
+
+        const fgPctT = totals.fgAtt ? ((totals.fgMade / totals.fgAtt) * 100).toFixed(1) + "%" : "0%";
+        const tpPctT = totals.threeAtt ? ((totals.threeMade / totals.threeAtt) * 100).toFixed(1) + "%" : "0%";
+        const ftPctT = totals.ftAtt ? ((totals.ftMade / totals.ftAtt) * 100).toFixed(1) + "%" : "0%";
+
+        const totalRow = \`
+          <tr style="font-weight:bold; background:#efefef;">
+            <td>Totals</td><td>\${totals.fgMade}-\${totals.fgAtt}</td><td>\${fgPctT}</td><td>\${totals.threeMade}-\${totals.threeAtt}</td>
+            <td>\${tpPctT}</td><td>\${totals.ftMade}-\${totals.ftAtt}</td><td>\${ftPctT}</td>
+            <td>\${totals.oreb}</td><td>\${totals.dreb}</td><td>\${totals.reb}</td><td>\${totals.ast}</td>
+            <td>\${totals.stl}</td><td>\${totals.blk}</td><td>\${totals.to}</td><td>\${totals.pts}</td>
+          </tr>\`;
+
+        return \`
+        <div style="margin-bottom:40px;">
+          <h2 style="text-align:center;">\${label}</h2>
+          <table border="1" cellpadding="6" cellspacing="0" style="width:100%; border-collapse:collapse; font-family:Arial; font-size:14px;">
+            <thead style="background:#E65300; color:white;">
+              <tr><th>Player</th><th>FG</th><th>FG%</th><th>3PT</th><th>3PT%</th><th>FT</th><th>FT%</th>
+              <th>OREB</th><th>DREB</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>PTS</th></tr>
+            </thead><tbody>\${rows.join("")}\${totalRow}</tbody>
+          </table>
+        </div>\`;
+      }
+
+      const boxHTML = \`
+        <html><head><title>Box Score</title><style>
+        body { padding: 20px; font-family: Arial; }
+        table th, td { text-align: center; padding: 4px; }
+        </style></head><body>
+        \${logoHTML}\${title}
+        \${renderTeam(players.home, "Team Takeover")}
+        \${renderTeam(players.opponent, "Opponent")}
+        </body></html>
+      \`;
+
+      const w = window.open();
+      w.document.write(boxHTML);
+      w.document.close();
+    }
+  </script>
+</body>
+</html>
