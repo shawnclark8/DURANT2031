@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Team Takeover Stat Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #ffffff;
+    }
+    .button-bar {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .button-bar button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #E65300;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .button-bar button:hover {
+      background-color: #c74800;
+    }
+  </style>
+</head>
+<body>
+  <div class="button-bar">
+    <button onclick="window.open('box_score_takeover_with_totals_v2.html', '_blank');">Box Score</button>
+    <button onclick="exportCSV()">Export to CSV</button>
+    <button onclick="addPlayer()">Add New Player</button>
+  </div>
+  <script>
+    function exportCSV() {
+      alert("Export to CSV triggered.");
+    }
+    function addPlayer() {
+      alert("Add New Player triggered.");
+    }
+  </script>
+</body>
+</html>
