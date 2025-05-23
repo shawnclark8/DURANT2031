@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Box Score – Team Takeover</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+    table { width: 100%; border-collapse: collapse; background-color: #fff; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: center; }
+    th { background-color: #eee; }
+    .totals-row { background-color: #ffe0cc; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h2>Team Takeover – Box Score</h2>
+
+<h3>Home Team</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Player</th><th>FG</th><th>FG%</th><th>3PT</th><th>3PT%</th><th>FT</th><th>FT%</th>
+      <th>OREB</th><th>DREB</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>PTS</th>
+    </tr>
+  </thead>
+  <tbody id="home-stats"></tbody>
+  <tfoot><tr class="totals-row" id="home-totals"><td colspan="15">Loading…</td></tr></tfoot>
+</table>
+
+<h3>Opponent</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Player</th><th>FG</th><th>FG%</th><th>3PT</th><th>3PT%</th><th>FT</th><th>FT%</th>
+      <th>OREB</th><th>DREB</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>PTS</th>
+    </tr>
+  </thead>
+  <tbody id="opponent-stats"></tbody>
+  <tfoot><tr class="totals-row" id="opponent-totals"><td colspan="15">Loading…</td></tr></tfoot>
+</table>
+
+<script>
+function renderTeam(team, tbodyId, tfootId) {
+  const tbody = document.getElementById(tbodyId);
+  const tfoot = document.getElementById(tfootId);
+  tbody.innerHTML = "";
+
+  const totals = {
+    fgMade: 0, fgAtt: 0, threeMade: 0, threeAtt: 0, ftMade: 0, ftAtt: 0,
+    oreb: 0, dreb: 0, reb: 0, ast: 0, stl: 0, blk: 0, to: 0, pts: 0
+  };
+
+  players[team].forEach(p => {
+    if (p.dnp) return;
+    const fgM = p["2pm"] + p["3pm"];
+    const fgA = fgM + p["2pmissed"] + p["3pmissed"];
+    const threeM = p["3pm"];
+    const threeA = p["3pm"] + p["3pmissed"];
+    const ftM = p["ftm"];
+    const ftA = ftM + p["ftmissed"];
+    const reb = p["oreb"] + p["dreb"];
+    const pts = (2 * p["2pm"]) + (3 * p["3pm"]) + ftM;
+
+    totals.fgMade += fgM; totals.fgAtt += fgA;
+    totals.threeMade += threeM; totals.threeAtt += threeA;
+    totals.ftMade += ftM; totals.ftAtt += ftA;
+    totals.oreb += p["oreb"]; totals.dreb += p["dreb"]; totals.reb += reb;
+    totals.ast += p["assists"]; totals.stl += p["stl"];
+    totals.blk += p["blk"]; totals.to += p["to"]; totals.pts += pts;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${p.name}</td>
+        <td>${fgM}-${fgA}</td><td>${fgA ? ((fgM / fgA) * 100).toFixed(1) + "%" : "0%"}</td>
+        <td>${threeM}-${threeA}</td><td>${threeA ? ((threeM / threeA) * 100).toFixed(1) + "%" : "0%"}</td>
+        <td>${ftM}-${ftA}</td><td>${ftA ? ((ftM / ftA) * 100).toFixed(1) + "%" : "0%"}</td>
+        <td>${p["oreb"]}</td><td>${p["dreb"]}</td><td>${reb}</td>
+        <td>${p["assists"]}</td><td>${p["stl"]}</td><td>${p["blk"]}</td><td>${p["to"]}</td><td>${pts}</td>
+      </tr>`;
+  });
+
+  tfoot.innerHTML = `
+    <td><strong>Team Total</strong></td>
+    <td>${totals.fgMade}-${totals.fgAtt}</td><td>${totals.fgAtt ? ((totals.fgMade / totals.fgAtt) * 100).toFixed(1) + "%" : "0%"}</td>
+    <td>${totals.threeMade}-${totals.threeAtt}</td><td>${totals.threeAtt ? ((totals.threeMade / totals.threeAtt) * 100).toFixed(1) + "%" : "0%"}</td>
+    <td>${totals.ftMade}-${totals.ftAtt}</td><td>${totals.ftAtt ? ((totals.ftMade / totals.ftAtt) * 100).toFixed(1) + "%" : "0%"}</td>
+    <td>${totals.oreb}</td><td>${totals.dreb}</td><td>${totals.reb}</td>
+    <td>${totals.ast}</td><td>${totals.stl}</td><td>${totals.blk}</td><td>${totals.to}</td><td>${totals.pts}</td>`;
+}
+
+function tryRender() {
+  if (typeof players !== "undefined") {
+    renderTeam("home", "home-stats", "home-totals");
+    renderTeam("opponent", "opponent-stats", "opponent-totals");
+  } else {
+    setTimeout(tryRender, 100);
+  }
+}
+
+tryRender();
+</script>
+
+</body>
+</html>
