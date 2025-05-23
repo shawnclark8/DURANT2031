@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Basketball Stat Tracker</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .setup-panel { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; background-color: #eef; }
+    table, th, td { border: 1px solid black; border-collapse: collapse; }
+    th, td { padding: 5px; text-align: center; }
+    .hidden { display: none; }
+    .scoreboard { font-weight: bold; margin: 10px 0; }
+    .stat-btn { font-size: 10px; padding: 2px 5px; margin-left: 3px; vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+<div class="setup-panel">
+  <h2>Game Setup</h2>
+  <label for="gameDate">Game Date:</label>
+  <input type="date" id="gameDate" value="2025-05-23">
+  <label for="opponentName">Opponent:</label>
+  <input type="text" id="opponentName" placeholder="Opponent Name" />
+  <br /><br />
+  <label for="playerSelect">Select Players:</label>
+  <select id="playerSelect" multiple>
+    <option>Kam</option>
+    <option>Ronald</option>
+    <option>Jaedyn</option>
+    <option>Khalifa</option>
+    <option>Eli</option>
+    <option>Sammy</option>
+    <option>Ceasar</option>
+    <option>Juice</option>
+    <option>Ben</option>
+    <option>Noah</option>
+    <option>Lefty</option>
+    <option>Goose</option>
+  </select>
+  <button onclick="startGame()">Start Game</button>
+</div>
+
+<div id="mainPanel" class="hidden">
+  <div class="scoreboard">
+    Home: <span id="homeScore">0</span> |
+    Opponent: <span id="opponentScore">0</span> |
+    Fouls 1st Half: <span id="homeFouls1">0</span> |
+    Fouls 2nd Half: <span id="homeFouls2">0</span>
+  </div>
+  <button onclick="resetFouls()">Reset Fouls</button>
+  <br /><br />
+
+  <h3>Home Team Stats</h3>
+  <table id="statTable">
+    <thead>
+      <tr>
+        <th>Player</th><th>PTS</th><th>OREB</th><th>DREB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>PF</th>
+        <th>2P Made</th><th>2P Miss</th>
+        <th>3P Made</th><th>3P Miss</th>
+        <th>FT Made</th><th>FT Miss</th>
+      </tr>
+    </thead>
+    <tbody id="homeBody"></tbody>
+    <tfoot>
+      <tr><td><strong>Total</strong></td><td colspan="14" id="homeTotals">0</td></tr>
+    </tfoot>
+  </table>
+
+  <h3>Opponent Stats (Proxy Player)</h3>
+  <table>
+    <tr><td contenteditable="true" colspan="15">Enter opponent team totals here manually</td></tr>
+  </table>
+</div>
+
+<script>
+let foulHalf = 1;
+
+function statCell(playerId, stat) {
+  return `
+    <td>
+      <span id="${stat}-${playerId}">0</span>
+      <button class="stat-btn" onclick="modStat('${stat}', ${playerId}, 1)">+</button>
+      <button class="stat-btn" onclick="modStat('${stat}', ${playerId}, -1)">-</button>
+    </td>
+  `;
+}
+
+function startGame() {
+  const selected = Array.from(document.getElementById("playerSelect").selectedOptions).map(o => o.value);
+  const tbody = document.getElementById("homeBody");
+  tbody.innerHTML = '';
+  selected.forEach((name, i) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${name}</td>` +
+      ['pts','oreb','dreb','ast','stl','blk','to','pf','2pm','2pmiss','3pm','3pmiss','ftm','ftmiss']
+      .map(stat => statCell(i, stat)).join('');
+    tbody.appendChild(row);
+  });
+  document.getElementById("mainPanel").classList.remove("hidden");
+  updateScore();
+}
+
+function modStat(stat, id, delta) {
+  const el = document.getElementById(`${stat}-${id}`);
+  let val = parseInt(el.textContent) + delta;
+  if (val < 0) val = 0;
+  el.textContent = val;
+  if (stat === 'pts') updateScore();
+  if (stat === 'pf') updateFouls(delta);
+}
+
+function updateScore() {
+  let total = 0;
+  document.querySelectorAll('[id^="pts-"]').forEach(cell => {
+    total += parseInt(cell.textContent);
+  });
+  document.getElementById("homeScore").textContent = total;
+  document.getElementById("homeTotals").textContent = total;
+}
+
+function updateFouls(delta) {
+  const field = `homeFouls${foulHalf}`;
+  const el = document.getElementById(field);
+  let count = parseInt(el.textContent) + delta;
+  if (count < 0) count = 0;
+  el.textContent = count;
+}
+
+function resetFouls() {
+  document.getElementById("homeFouls1").textContent = "0";
+  document.getElementById("homeFouls2").textContent = "0";
+}
+</script>
+
+</body>
+</html>
